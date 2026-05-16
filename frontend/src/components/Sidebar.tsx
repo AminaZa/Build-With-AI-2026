@@ -18,10 +18,15 @@ export function Sidebar() {
     <div className="fixed inset-y-0 left-0 w-[240px] bg-slate-900 border-r border-slate-800 flex flex-col z-30 shadow-2xl">
       <div className="flex h-20 shrink-0 items-center px-8">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <span className="text-white font-black text-lg">L</span>
+          <div className="relative">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <span className="text-white font-black text-lg">L</span>
+            </div>
+            <div className="absolute -top-1 -right-4 bg-indigo-500 text-[8px] font-black text-white px-1.5 py-0.5 rounded-full border-2 border-slate-900">
+              AI
+            </div>
           </div>
-          <span className="text-xl font-bold tracking-tight text-white uppercase">LinkMind</span>
+          <span className="text-xl font-bold tracking-tight text-white uppercase ml-1">LinkMind</span>
         </div>
       </div>
       
