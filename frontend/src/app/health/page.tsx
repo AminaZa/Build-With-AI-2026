@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { api, BackendActor, BackendLinkage } from '@/services/api';
+import { api, API_BASE, BackendActor, BackendLinkage } from '@/services/api';
 
 function band(score: number) {
   if (score >= 70) return { label: 'Healthy', tone: 'good' };
@@ -35,7 +35,7 @@ export default async function HealthDashboardPage() {
   try {
     [linkages, actors] = await Promise.all([
       api.getLinkagesRaw('prog_B'),
-      fetch('http://localhost:8000/api/actors', { cache: 'no-store' }).then((r) => r.json()),
+      fetch(`${API_BASE}/api/actors`, { cache: 'no-store' }).then((r) => r.json()),
     ]);
   } catch {
     // backend unreachable — render empty state below

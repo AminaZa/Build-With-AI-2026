@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Users, Briefcase, Handshake, Search, X, Sparkles, RefreshCw } from 'lucide-react';
 import EcosystemGraph from '@/components/EcosystemGraph';
-import type { BackendActor, BackendLinkage } from '@/services/api';
+import { API_BASE, type BackendActor, type BackendLinkage } from '@/services/api';
 
 const TYPE_META = {
   mentor: { label: 'Mentors', icon: Users, iconClass: 'text-violet-400', dot: 'bg-violet-500' },
@@ -26,8 +26,8 @@ export default function EcosystemPage() {
     setRefreshing(true);
     try {
       const [a, l] = await Promise.all([
-        fetch('http://localhost:8000/api/actors').then((r) => r.json()),
-        fetch('http://localhost:8000/api/linkages').then((r) => r.json()),
+        fetch(`${API_BASE}/api/actors`).then((r) => r.json()),
+        fetch(`${API_BASE}/api/linkages`).then((r) => r.json()),
       ]);
       setActors(a);
       setLinkages(l);

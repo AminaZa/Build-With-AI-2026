@@ -16,14 +16,21 @@ load_dotenv()
 FIREBASE_KEY_PATH = os.getenv('FIREBASE_CREDENTIALS_PATH', 'firebase-key.json')
 FIRESTORE_DB_ID = os.getenv('FIRESTORE_DATABASE', '(database2)')
 
-# Initialize Firebase
+# Initialize Firebase. On local dev we read a service-account JSON. On Cloud Run
+# (no JSON present) we fall back to Application Default Credentials — the
+# Cloud Run runtime service account is used automatically.
 try:
-    cred = credentials.Certificate(FIREBASE_KEY_PATH)
-    firebase_admin.initialize_app(cred)
+    if FIREBASE_KEY_PATH and os.path.exists(FIREBASE_KEY_PATH):
+        cred = credentials.Certificate(FIREBASE_KEY_PATH)
+        firebase_admin.initialize_app(cred)
+        auth_mode = f"service-account file ({FIREBASE_KEY_PATH})"
+    else:
+        firebase_admin.initialize_app()  # Application Default Credentials
+        auth_mode = "Application Default Credentials"
     db = firestore.client(database_id=FIRESTORE_DB_ID)
-    print(f"Firestore connected | database: {FIRESTORE_DB_ID}")
+    print(f"Firestore connected | database: {FIRESTORE_DB_ID} | auth: {auth_mode}")
 except Exception as e:
-    print(f"Warning: Failed to initialize Firebase. Ensure {FIREBASE_KEY_PATH} exists, Firestore API is enabled, and database '{FIRESTORE_DB_ID}' exists. Error: {e}")
+    print(f"Warning: Failed to initialize Firebase. Error: {e}")
     db = None
 
 app = FastAPI(

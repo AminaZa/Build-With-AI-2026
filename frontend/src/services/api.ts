@@ -1,7 +1,8 @@
 // Frontend API client. Targets the FastAPI backend at localhost:8000.
 // Falls back to mock data if the backend is unreachable so the demo never blanks.
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
+const BASE = API_BASE;
 
 // ---------- Backend response shapes ----------
 

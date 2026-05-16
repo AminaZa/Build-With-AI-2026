@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Rocket, Loader2 } from 'lucide-react';
+import { API_BASE } from '@/services/api';
 
 interface Programme {
   id: string;
@@ -35,7 +36,7 @@ export default function ProgrammesPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/programmes')
+    fetch(`${API_BASE}/api/programmes`)
       .then((r) => r.json())
       .then(setProgrammes)
       .catch(() => setError('Backend unreachable on :8000'));
@@ -46,7 +47,7 @@ export default function ProgrammesPage() {
     setError(null);
     setResult(null);
     try {
-      const r = await fetch(`http://localhost:8000/api/programmes/${progId}/launch`, { method: 'POST' });
+      const r = await fetch(`${API_BASE}/api/programmes/${progId}/launch`, { method: 'POST' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       setResult(await r.json());
     } catch (e) {

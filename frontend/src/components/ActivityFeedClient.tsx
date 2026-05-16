@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { CheckCircle, Activity, Clock, AlertTriangle, ChevronDown, ChevronRight, Check, X, Loader2, MessageSquare } from 'lucide-react';
-import { api, Action, BackendStatsSummary } from '@/services/api';
+import { api, API_BASE, Action, BackendStatsSummary } from '@/services/api';
 
 // -- Helpers --
 
@@ -355,7 +355,7 @@ function ActionCard({ action }: { action: Action }) {
   async function undo() {
     setUndoing(true);
     try {
-      const r = await fetch(`http://localhost:8000/api/actions/${action.id}/undo`, { method: 'POST' });
+      const r = await fetch(`${API_BASE}/api/actions/${action.id}/undo`, { method: 'POST' });
       if (r.ok) setUndone(true);
     } finally {
       setUndoing(false);

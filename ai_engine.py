@@ -18,14 +18,17 @@ model = None
 try:
     if not GCP_PROJECT_ID:
         print("WARNING: GCP_PROJECT_ID not set in environment.")
-    elif not CREDENTIALS_PATH or not os.path.exists(CREDENTIALS_PATH):
-        print(f"WARNING: GOOGLE_APPLICATION_CREDENTIALS missing or file not found: {CREDENTIALS_PATH}")
     else:
-        credentials = service_account.Credentials.from_service_account_file(
-            CREDENTIALS_PATH,
-            scopes=['https://www.googleapis.com/auth/cloud-platform'],
-        )
-        vertexai.init(project=GCP_PROJECT_ID, location=GCP_LOCATION, credentials=credentials)
+        if CREDENTIALS_PATH and os.path.exists(CREDENTIALS_PATH):
+            # Local dev: explicit service-account JSON
+            sa_credentials = service_account.Credentials.from_service_account_file(
+                CREDENTIALS_PATH,
+                scopes=['https://www.googleapis.com/auth/cloud-platform'],
+            )
+            vertexai.init(project=GCP_PROJECT_ID, location=GCP_LOCATION, credentials=sa_credentials)
+        else:
+            # Cloud Run / Application Default Credentials
+            vertexai.init(project=GCP_PROJECT_ID, location=GCP_LOCATION)
         model = GenerativeModel(GEMINI_MODEL)
 except Exception as e:
     print(f"WARNING: Failed to initialize Vertex AI: {e}")

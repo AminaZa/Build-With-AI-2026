@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Sparkles, Loader2, Check } from 'lucide-react';
+import { API_BASE } from '@/services/api';
 
 interface Pairing {
   mentorId: string;
@@ -31,7 +32,7 @@ export default function MatchingPage() {
     setPlan(null);
     setApproved(false);
     try {
-      const r = await fetch('http://localhost:8000/api/matching/generate', { method: 'POST' });
+      const r = await fetch(`${API_BASE}/api/matching/generate`, { method: 'POST' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       setPlan(await r.json());
     } catch (e) {
@@ -46,7 +47,7 @@ export default function MatchingPage() {
     setApproving(true);
     setError(null);
     try {
-      const r = await fetch('http://localhost:8000/api/matching/approve', { method: 'POST' });
+      const r = await fetch(`${API_BASE}/api/matching/approve`, { method: 'POST' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       await r.json();
       setApproved(true);

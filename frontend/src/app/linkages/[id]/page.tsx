@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { BackendActor, BackendLinkage } from '@/services/api';
+import { API_BASE, BackendActor, BackendLinkage } from '@/services/api';
 import { ArrowLeft } from 'lucide-react';
 
 async function fetchJson<T>(path: string): Promise<T | null> {
   try {
-    const r = await fetch(`http://localhost:8000${path}`, { cache: 'no-store' });
+    const r = await fetch(`${API_BASE}${path}`, { cache: 'no-store' });
     if (!r.ok) return null;
     return r.json() as Promise<T>;
   } catch {
