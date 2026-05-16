@@ -21,12 +21,22 @@ def check(label, condition, detail=''):
     return condition
 
 
+def find_seed_dir():
+    # Works whether this file is at repo root (post-merge) or in backend/ (pre-merge)
+    here = os.path.dirname(os.path.abspath(__file__))
+    for candidate in [os.path.join(here, 'seed_data'),
+                      os.path.join(os.path.dirname(here), 'seed_data')]:
+        if os.path.isdir(candidate):
+            return candidate
+    raise FileNotFoundError("Could not locate seed_data/ next to or above test_execution.py")
+
+
 def main():
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    actors = load_json(os.path.join(base, 'seed_data', 'actors.json'))
-    linkages = load_json(os.path.join(base, 'seed_data', 'linkages.json'))
-    programmes = load_json(os.path.join(base, 'seed_data', 'programmes.json'))
-    actions_log = load_json(os.path.join(base, 'seed_data', 'actions.json'))
+    seed_dir = find_seed_dir()
+    actors = load_json(os.path.join(seed_dir, 'actors.json'))
+    linkages = load_json(os.path.join(seed_dir, 'linkages.json'))
+    programmes = load_json(os.path.join(seed_dir, 'programmes.json'))
+    actions_log = load_json(os.path.join(seed_dir, 'actions.json'))
 
     actor_ids = {a['id'] for a in actors}
     mentors = [a for a in actors if a['type'] == 'mentor']

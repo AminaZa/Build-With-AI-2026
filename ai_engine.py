@@ -220,14 +220,17 @@ def _compute_tier(linkage_data: dict, llm_tier: str = None) -> str:
     return llm_tier if llm_tier in {'auto', 'inform', 'approve'} else 'auto'
 
 
-def generate_matching_plan(mentors, startups, goals, historical_data=None):
+def generate_matching_plan(mentors, partners, startups, goals, historical_data=None):
     cache_key = 'matching_plan_success'
     prompt = f"""You are an ecosystem matching engine for an innovation programme.
 
-Your job: create optimal mentor-startup pairings that maximize programme outcomes.
+Your job: create optimal mentor-startup OR partner-startup pairings that maximize programme outcomes.
 
 AVAILABLE MENTORS:
 {json.dumps(mentors, indent=2)}
+
+AVAILABLE PARTNERS (for specialized needs like fundraising, regulatory, or corporate access):
+{json.dumps(partners, indent=2)}
 
 UNMATCHED STARTUPS:
 {json.dumps(startups, indent=2)}
@@ -238,8 +241,9 @@ PROGRAMME GOALS:
 {"HISTORICAL DATA FROM PAST PROGRAMMES:" + json.dumps(historical_data, indent=2) if historical_data else "No historical data available — this is the first programme."}
 
 RULES:
-- Each mentor can be matched to at most their capacity limit
+- Each mentor or partner can be matched to at most their capacity limit
 - Prioritize expertise alignment (mentor's expertise should match startup's domain)
+- PARTNER MATCH RULE: If a startup indicates they are raising capital, fundraising, or need regulatory/corporate help, prioritize matching them with a Partner.
 - DIVERSITY GUARDRAIL: Avoid concentrating more than 2 startups on a single mentor even if capacity allows 3. If a mentor must take a 3rd, flag it in 'risks' and lower confidence. Surface newer mentors (no historicalScore) where their expertise fits, with a note that they're a cold-start pick.
 - ECOSYSTEM CONFLICT-OF-INTEREST GUARDRAIL: If a mentor is already assigned to a startup in the exact same domain/niche, flag a warning in the 'risks' field and lower the matching confidence score.
 - If historical data exists, factor in past performance (high satisfaction = prefer that mentor for similar startups)
@@ -250,7 +254,7 @@ IMPORTANT: Return ONLY a raw JSON object. Do not include any markdown formatting
 {{
   "pairings": [
     {{
-      "mentorId": "mentor_001",
+      "mentorId": "mentor_001 OR partner_001",
       "startupId": "startup_001",
       "confidence": 0.92,
       "reasoning": "2-3 sentence explanation of why this is a good match",

@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, Share2, Sparkles, Layers } from 'lucide-react';
+import { Activity, Share2, Sparkles, Layers, HeartPulse } from 'lucide-react';
 
 const navItems = [
   { name: 'Activity Feed', href: '/', icon: Activity },
-  { name: 'Ecosystem Graph', href: '/ecosystem', icon: Share2 },
+  { name: 'Health Dashboard', href: '/health', icon: HeartPulse },
+  { name: 'Ecosystem', href: '/ecosystem', icon: Share2 },
   { name: 'Smart Matching', href: '/matching', icon: Sparkles },
   { name: 'Programmes', href: '/programmes', icon: Layers },
 ];
@@ -15,11 +16,11 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed inset-y-0 left-0 w-[240px] bg-slate-900 text-slate-300 flex flex-col">
-      <div className="flex h-16 shrink-0 items-center px-6">
-        <div className="flex items-center gap-2 font-semibold text-lg text-white">
-          <div className="h-8 w-8 rounded-md bg-indigo-500 flex items-center justify-center">
-            <span className="text-white font-bold leading-none">LM</span>
+    <div className="fixed inset-y-0 left-0 w-[240px] bg-[#0B0D14] text-[#8B8D98] flex flex-col border-r border-[#1A1D27]">
+      <div className="flex h-16 shrink-0 items-center px-6 border-b border-[#1A1D27]">
+        <div className="flex items-center gap-2.5 font-semibold text-lg text-[#E8E9ED]">
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <span className="text-white font-bold leading-none text-sm">LM</span>
           </div>
           LinkMind
         </div>
@@ -32,13 +33,13 @@ export function Sidebar() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
                   isActive
-                    ? 'bg-slate-800 text-white'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                    ? 'bg-[#1A1D27] text-[#E8E9ED] shadow-sm'
+                    : 'text-[#5F6170] hover:bg-[#1A1D27]/60 hover:text-[#8B8D98]'
                 }`}
               >
-                <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                <item.icon className={`h-5 w-5 shrink-0 ${isActive ? 'text-indigo-400' : ''}`} aria-hidden="true" />
                 {item.name}
               </Link>
             );

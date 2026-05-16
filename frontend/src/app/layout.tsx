@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "LinkMind",
-  description: "Enterprise SaaS for LinkMind",
+  description: "AI-Powered Ecosystem Intelligence Platform",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="h-full bg-slate-50 font-sans text-slate-900">
+      <body className="h-full bg-[#0F1117] font-sans text-[#E8E9ED]">
         <Sidebar />
         <div className="pl-[240px] flex flex-col min-h-screen">
           <Header />

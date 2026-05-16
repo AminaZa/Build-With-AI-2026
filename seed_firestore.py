@@ -28,14 +28,21 @@ def seed_collection(db, collection_name, data_list):
     print(f"Seeded {count} documents into collection '{collection_name}'.")
 
 def main():
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    FIREBASE_KEY_PATH = os.getenv('FIREBASE_CREDENTIALS_PATH', 'firebase-key.json')
+    DB_ID = os.getenv('FIRESTORE_DATABASE', '(default)')
+
     # Initialize Firebase Admin SDK
-    cred = credentials.Certificate('firebase-key.json')
+    cred = credentials.Certificate(FIREBASE_KEY_PATH)
     app = firebase_admin.initialize_app(cred)
-    db = firestore.client()
+    db = firestore.client(database_id=DB_ID)
+    print(f"Targeting Firestore database: {DB_ID}")
 
     print("Firebase initialized. Starting seeding process...")
 
-    data_dir = os.path.join('venv', 'data')
+    data_dir = 'seed_data'
 
     collections_to_seed = [
         ('actors', 'actors.json'),

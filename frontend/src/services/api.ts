@@ -1,3 +1,61 @@
+// Frontend API client. Targets the FastAPI backend at localhost:8000.
+// Falls back to mock data if the backend is unreachable so the demo never blanks.
+
+const BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
+
+// ---------- Backend response shapes ----------
+
+export interface BackendActor {
+  id: string;
+  type: 'mentor' | 'startup' | 'partner';
+  name: string;
+  expertise?: string[];
+  domain?: string;
+  capacity?: number;
+  historicalScore?: number;
+  programmes?: string[];
+}
+
+export interface BackendLinkage {
+  id: string;
+  type: string;
+  status: 'active' | 'paused' | 'completed' | 'proposed';
+  mentorId: string;
+  startupId: string;
+  programmeId: string;
+  healthScore: number;
+  healthTrend: 'improving' | 'stable' | 'declining';
+  autonomyLevel: 'silent' | 'notify' | 'approve';
+  signals: { meetingFrequency: number; feedbackAvg: number; [k: string]: unknown };
+  aiInsight?: string;
+}
+
+export interface BackendAction {
+  id: string;
+  linkageId?: string;
+  type: string;
+  description: string;
+  status: 'executed' | 'proposed' | 'approved' | 'rejected' | 'pending';
+  timestamp: string;
+  aiReasoning?: string;
+  tier?: 'auto' | 'inform' | 'approve';
+}
+
+export interface BackendStatsSummary {
+  autoExecuted: number;
+  informed: number;
+  pendingApproval: number;
+  overridden: number;
+}
+
+export interface BackendStatsHealth {
+  healthy: number;
+  atRisk: number;
+  failing: number;
+}
+
+// ---------- Frontend display shapes ----------
+
 export interface Actor {
   id: string;
   name: string;
@@ -10,41 +68,132 @@ export interface Linkage {
   sourceActorId: string;
   targetActorId: string;
   type: string;
-  strength: number; // 1 to 100
+  strength: number;
 }
+
+export type TierType = 'auto' | 'inform' | 'approve';
 
 export interface Action {
   id: string;
-  type: 'Auto-executed' | 'Informed' | 'Awaiting Approval';
+  tier: TierType;
+  type: string;
   description: string;
   timestamp: string;
-  actorId: string;
+  linkageId: string;
+  aiReasoning?: string;
+  status: string;
 }
 
-// Mock Data
+// ---------- Tier inference ----------
+
+function inferTier(a: BackendAction): TierType {
+  // If the backend provides a tier field, prefer that
+  if (a.tier === 'auto' || a.tier === 'inform' || a.tier === 'approve') return a.tier;
+  // Otherwise infer from status and action type
+  if (a.status === 'proposed' || a.status === 'pending') return 'approve';
+  const informTypes = ['agenda_sent', 'cadence_adjusted', 'nudge_sent', 'alert_sent', 'assessment_sent', 'partner_connected'];
+  if (informTypes.includes(a.type)) return 'inform';
+  return 'auto';
+}
+
+// ---------- Fallback mocks (if backend unreachable) ----------
+
 const MOCK_ACTORS: Actor[] = [
-  { id: '1', name: 'Sarah Admin', role: 'Administrator', status: 'active' },
-  { id: '2', name: 'Dr. Emily Chen', role: 'Programme Manager', status: 'active' },
+  { id: 'mentor_001', name: 'Dr. Aisha Rahman', role: 'Mentor', status: 'active' },
+  { id: 'startup_001', name: 'PayFlex', role: 'Startup', status: 'active' },
 ];
-
 const MOCK_LINKAGES: Linkage[] = [
-  { id: '1', sourceActorId: '1', targetActorId: '2', type: 'Supervises', strength: 80 },
+  { id: 'link_B_01', sourceActorId: 'mentor_001', targetActorId: 'startup_001', type: 'mentorship', strength: 91 },
+];
+const MOCK_ACTIONS: Action[] = [
+  { id: 'a1', tier: 'auto', type: 'nudge_sent', description: 'Sent weekly meeting reminder', timestamp: new Date().toISOString(), linkageId: 'link_B_01', status: 'executed' },
 ];
 
-const MOCK_ACTIONS: Action[] = [
-  { id: '1', type: 'Auto-executed', description: 'Matched Student A with Tutor B', timestamp: '2026-05-16T08:00:00Z', actorId: '1' },
-  { id: '2', type: 'Informed', description: 'Programme completion report generated', timestamp: '2026-05-16T09:15:00Z', actorId: '2' },
-  { id: '3', type: 'Awaiting Approval', description: 'New ecosystem partner request', timestamp: '2026-05-16T10:30:00Z', actorId: '1' },
-];
+// ---------- Helpers ----------
+
+async function fetchJson<T>(path: string): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`${path} → ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+// ---------- Public API ----------
 
 export const api = {
-  getActors: async (): Promise<Actor[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(MOCK_ACTORS), 500));
+  async getActors(): Promise<Actor[]> {
+    try {
+      const data = await fetchJson<BackendActor[]>('/api/actors');
+      return data.map((a) => ({
+        id: a.id,
+        name: a.name,
+        role: a.type === 'mentor' ? 'Mentor' : a.type === 'startup' ? 'Startup' : 'Partner',
+        status: 'active' as const,
+      }));
+    } catch {
+      return MOCK_ACTORS;
+    }
   },
-  getLinkages: async (): Promise<Linkage[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(MOCK_LINKAGES), 500));
+
+  async getLinkages(): Promise<Linkage[]> {
+    try {
+      const data = await fetchJson<BackendLinkage[]>('/api/linkages');
+      return data.map((l) => ({
+        id: l.id,
+        sourceActorId: l.mentorId,
+        targetActorId: l.startupId,
+        type: l.type,
+        strength: l.healthScore,
+      }));
+    } catch {
+      return MOCK_LINKAGES;
+    }
   },
-  getActions: async (): Promise<Action[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(MOCK_ACTIONS), 500));
+
+  async getActions(): Promise<Action[]> {
+    try {
+      const data = await fetchJson<BackendAction[]>('/api/actions');
+      return data.map((a) => ({
+        id: a.id,
+        tier: inferTier(a),
+        type: a.type,
+        description: a.description,
+        timestamp: a.timestamp,
+        linkageId: a.linkageId ?? '',
+        aiReasoning: a.aiReasoning,
+        status: a.status || 'executed',
+      }));
+    } catch {
+      return MOCK_ACTIONS;
+    }
+  },
+
+  // Raw passthroughs for pages that want the richer shape
+  async getStatsSummary(): Promise<BackendStatsSummary> {
+    return fetchJson<BackendStatsSummary>('/api/stats/summary');
+  },
+
+  async getStatsHealth(): Promise<BackendStatsHealth> {
+    return fetchJson<BackendStatsHealth>('/api/stats/health');
+  },
+
+  async getLinkagesRaw(programme?: string): Promise<BackendLinkage[]> {
+    const q = programme ? `?programme=${encodeURIComponent(programme)}` : '';
+    return fetchJson<BackendLinkage[]>(`/api/linkages${q}`);
+  },
+
+  async getPendingActions(): Promise<BackendAction[]> {
+    return fetchJson<BackendAction[]>('/api/actions?status=proposed');
+  },
+
+  async approveAction(id: string): Promise<{ status: string; message: string }> {
+    const r = await fetch(`${BASE}/api/actions/${id}/approve`, { method: 'POST' });
+    if (!r.ok) throw new Error(`approve ${id} → ${r.status}`);
+    return r.json();
+  },
+
+  async rejectAction(id: string): Promise<{ status: string; message: string }> {
+    const r = await fetch(`${BASE}/api/actions/${id}/reject`, { method: 'POST' });
+    if (!r.ok) throw new Error(`reject ${id} → ${r.status}`);
+    return r.json();
   },
 };
