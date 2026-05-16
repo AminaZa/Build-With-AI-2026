@@ -1,0 +1,28 @@
+# Secrets
+.env
+.env.local
+*-service-account*.json
+*firebase-adminsdk*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Node (frontend)
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
