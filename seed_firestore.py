@@ -1,10 +1,11 @@
-import json
+
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import os
 
 def load_json(filepath):
+    import json
     with open(filepath, 'r') as f:
         return json.load(f)
 
@@ -48,7 +49,8 @@ def main():
         ('actors', 'actors.json'),
         ('programmes', 'programmes.json'),
         ('linkages', 'linkages.json'),
-        ('actions', 'actions.json')
+        ('actions', 'actions.json'),
+        ('linkages', 'biggerset.json')
     ]
 
     for collection_name, filename in collections_to_seed:

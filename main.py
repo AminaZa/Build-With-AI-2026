@@ -9,12 +9,12 @@ from dateutil.parser import parse
 import firebase_admin
 from firebase_admin import credentials, firestore
 import ai_engine
-
+from dotenv import load_dotenv
 import os
-
+load_dotenv()
 # Load Firebase credentials path from .env
 FIREBASE_KEY_PATH = os.getenv('FIREBASE_CREDENTIALS_PATH', 'firebase-key.json')
-FIRESTORE_DB_ID = os.getenv('FIRESTORE_DATABASE', '(default)')
+FIRESTORE_DB_ID = os.getenv('FIRESTORE_DATABASE', '(database2)')
 
 # Initialize Firebase
 try:
@@ -293,6 +293,14 @@ def generate_matching():
     # Build name lookup for readable descriptions
     name_map = {a['id']: a.get('name', a['id']) for a in mentors + partners + startups}
     
+    # Build set of existing linkages to skip duplicates
+    existing_linkages = set()
+    for doc in db.collection('linkages').stream():
+        l = doc.to_dict()
+        pair_key = f"{l.get('mentorId', '')}_{l.get('startupId', '')}"
+        if l.get('status') in ('active', 'proposed'):
+            existing_linkages.add(pair_key)
+    
     goals = {
         "engagementRate": 85,
         "matchCount": 20,
@@ -303,12 +311,20 @@ def generate_matching():
     
     ai_response = ai_engine.generate_matching_plan(mentors, partners, startups, goals, historical_linkages)
     
-    # Persist each pairing as a new proposed linkage + log an action
+    # Auto-execute each pairing as an active linkage (skip duplicates)
     now = datetime.datetime.utcnow().isoformat() + "Z"
     created_linkages = []
+    skipped = []
     for pairing in ai_response.get('pairings', []):
         mentor_id = pairing.get('mentorId', '')
         startup_id = pairing.get('startupId', '')
+        pair_key = f"{mentor_id}_{startup_id}"
+        
+        # Skip if this pair is already matched
+        if pair_key in existing_linkages:
+            skipped.append(pair_key)
+            continue
+        
         linkage_id = f"link_match_{mentor_id}_{startup_id}"
         mentor_name = name_map.get(mentor_id, mentor_id)
         startup_name = name_map.get(startup_id, startup_id)
@@ -316,35 +332,37 @@ def generate_matching():
         linkage_data = {
             'id': linkage_id,
             'type': 'mentorship',
-            'status': 'proposed',
+            'status': 'active',
             'mentorId': mentor_id,
             'startupId': startup_id,
             'programmeId': 'prog_B',
-            'healthScore': 50,
-            'healthTrend': 'stable',
-            'autonomyLevel': 'notify',
+            'healthScore': 60,
+            'healthTrend': 'improving',
+            'autonomyLevel': 'silent',
             'signals': {'meetingFrequency': 0, 'feedbackAvg': 0},
             'aiInsight': pairing.get('reasoning', ''),
             'confidence': pairing.get('confidence', 0),
         }
         db.collection('linkages').document(linkage_id).set(linkage_data)
         created_linkages.append(linkage_id)
+        existing_linkages.add(pair_key)
         
-        # Log an action for the activity feed
+        # Log as auto-executed (no approval needed for smart matches)
         action_ref = db.collection('actions').document()
         action_data = {
             'id': action_ref.id,
             'linkageId': linkage_id,
-            'type': 'match_proposed',
-            'tier': 'approve',
-            'description': f"AI proposes pairing {mentor_name} \u2194 {startup_name} (confidence: {int(pairing.get('confidence', 0) * 100)}%)",
-            'status': 'proposed',
+            'type': 'match_activated',
+            'tier': 'auto',
+            'description': f"Smart-matched and activated: {mentor_name} \u2194 {startup_name} (confidence: {int(pairing.get('confidence', 0) * 100)}%)",
+            'status': 'executed',
             'timestamp': now,
             'aiReasoning': pairing.get('reasoning', ''),
         }
         action_ref.set(action_data)
     
     ai_response['createdLinkages'] = created_linkages
+    ai_response['skippedDuplicates'] = skipped
     return ai_response
 
 @app.post("/api/matching/approve")
@@ -547,30 +565,134 @@ def trigger_agent_engine():
     if not db: raise HTTPException(status_code=500, detail="Database not connected")
     
     executed_actions = []
-    linkages_ref = db.collection('linkages').where('status', '==', 'active').stream()
+    auto_disconnected = []
+    auto_reassigned = []
+    linkages_ref = list(db.collection('linkages').where('status', '==', 'active').stream())
+    
+    # Collect all mentors for potential reassignment
+    all_mentors = {d.id: d.to_dict() for d in db.collection('actors').where('type', '==', 'mentor').stream()}
+    name_map = {mid: m.get('name', mid) for mid, m in all_mentors.items()}
+    # Also get startup names
+    for d in db.collection('actors').where('type', '==', 'startup').stream():
+        name_map[d.id] = d.to_dict().get('name', d.id)
+    
+    # Count current assignments per mentor
+    mentor_load = {}
+    for ldoc in linkages_ref:
+        l = ldoc.to_dict()
+        mid = l.get('mentorId', '')
+        mentor_load[mid] = mentor_load.get(mid, 0) + 1
+    
+    now = datetime.datetime.utcnow().isoformat() + "Z"
     
     for linkage_doc in linkages_ref:
         linkage = linkage_doc.to_dict()
         linkage_id = linkage_doc.id
             
         new_score = compute_health_score(linkage)
-        # Update health score in DB
         db.collection('linkages').document(linkage_id).update({'healthScore': new_score})
         linkage['healthScore'] = new_score
         
+        mentor_id = linkage.get('mentorId', '')
+        startup_id = linkage.get('startupId', '')
+        mentor_name = name_map.get(mentor_id, mentor_id)
+        startup_name = name_map.get(startup_id, startup_id)
+        
+        # === AUTO-DISCONNECT: critically failing (health < 20) ===
+        if new_score < 20:
+            db.collection('linkages').document(linkage_id).update({
+                'status': 'completed',
+                'aiInsight': f'Auto-disconnected: health score critically low ({new_score}/100).',
+            })
+            action_ref = db.collection('actions').document()
+            act = {
+                'id': action_ref.id,
+                'linkageId': linkage_id,
+                'type': 'auto_disconnected',
+                'tier': 'auto',
+                'description': f'Auto-disconnected {mentor_name} \u2194 {startup_name} (health: {new_score}/100).',
+                'status': 'executed',
+                'timestamp': now,
+                'aiReasoning': f'Health score dropped to {new_score}, well below the 20-point threshold. The relationship is non-functional and has been automatically terminated.',
+            }
+            action_ref.set(act)
+            executed_actions.append(act)
+            auto_disconnected.append(linkage_id)
+            # Free up mentor capacity
+            mentor_load[mentor_id] = mentor_load.get(mentor_id, 1) - 1
+            continue
+        
+        # === AUTO-REASSIGN: failing (health < 40) — find a better mentor ===
+        if new_score < 40:
+            # Find a mentor with capacity and relevant expertise
+            startup_doc = db.collection('actors').document(startup_id).get()
+            startup_domain = ''
+            if startup_doc.exists:
+                startup_data = startup_doc.to_dict()
+                startup_domain = startup_data.get('domain', '')
+            
+            best_new_mentor = None
+            for mid, mdata in all_mentors.items():
+                if mid == mentor_id:
+                    continue  # skip current mentor
+                capacity = mdata.get('capacity', 2)
+                current_load = mentor_load.get(mid, 0)
+                if current_load >= capacity:
+                    continue  # at capacity
+                # Prefer domain match
+                expertise = mdata.get('expertise', [])
+                if startup_domain and any(startup_domain.lower() in e.lower() for e in expertise):
+                    best_new_mentor = mid
+                    break
+                if best_new_mentor is None:
+                    best_new_mentor = mid  # fallback: first available
+            
+            if best_new_mentor:
+                new_mentor_name = name_map.get(best_new_mentor, best_new_mentor)
+                db.collection('linkages').document(linkage_id).update({
+                    'mentorId': best_new_mentor,
+                    'healthScore': 55,
+                    'healthTrend': 'improving',
+                    'aiInsight': f'Auto-reassigned from {mentor_name} to {new_mentor_name}.',
+                })
+                # Update load tracking
+                mentor_load[mentor_id] = mentor_load.get(mentor_id, 1) - 1
+                mentor_load[best_new_mentor] = mentor_load.get(best_new_mentor, 0) + 1
+                
+                action_ref = db.collection('actions').document()
+                act = {
+                    'id': action_ref.id,
+                    'linkageId': linkage_id,
+                    'type': 'auto_reassigned',
+                    'tier': 'auto',
+                    'description': f'Auto-reassigned {startup_name}: {mentor_name} \u2192 {new_mentor_name} (was {new_score}/100).',
+                    'status': 'executed',
+                    'timestamp': now,
+                    'aiReasoning': f'Health score is {new_score}/100 (failing). {new_mentor_name} has capacity and matching expertise. Reassignment executed automatically.',
+                }
+                action_ref.set(act)
+                executed_actions.append(act)
+                auto_reassigned.append(linkage_id)
+                continue
+        
+        # === NORMAL: use AI engine for moderate interventions ===
         action = determine_agent_action(linkage, new_score)
         if action:
-            # Add action to DB
             action['linkageId'] = linkage_id
-            action['timestamp'] = datetime.datetime.utcnow().isoformat() + "Z"
-            if 'status' not in action:
-                action['status'] = 'executed' if action.get('tier') in ['auto', 'inform'] else 'pending'
+            action['timestamp'] = now
+            # All actions auto-execute now — no more pending
+            action['status'] = 'executed'
             
-            # Use a generated ID or custom ID
             new_action_ref = db.collection('actions').document()
             action['id'] = new_action_ref.id
             new_action_ref.set(action)
             
             executed_actions.append(action)
             
-    return {"status": "success", "actionsProcessed": len(executed_actions), "actions": executed_actions}
+    return {
+        "status": "success",
+        "actionsProcessed": len(executed_actions),
+        "autoDisconnected": len(auto_disconnected),
+        "autoReassigned": len(auto_reassigned),
+        "actions": executed_actions
+    }

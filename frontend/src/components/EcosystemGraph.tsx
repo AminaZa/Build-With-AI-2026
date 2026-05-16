@@ -105,7 +105,7 @@ export default function EcosystemGraph({ actors, linkages, selectedId, onNodeCli
     >
       <button
         onClick={() => fgRef.current?.zoomToFit(600, 80)}
-        className="absolute bottom-[260px] right-6 z-10 rounded-md bg-[#1A1D27]/90 backdrop-blur border border-[#2A2D3A] px-3 py-1.5 text-xs font-medium text-[#8B8D98] hover:bg-[#232733] shadow-md"
+        className="absolute top-6 left-1/2 -translate-x-1/2 z-10 rounded-md bg-[#1A1D27]/90 backdrop-blur border border-[#2A2D3A] px-3 py-1.5 text-xs font-medium text-[#8B8D98] hover:bg-[#232733] shadow-md"
       >
         Fit to view
       </button>
