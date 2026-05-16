@@ -14,7 +14,7 @@ import os
 load_dotenv()
 # Load Firebase credentials path from .env
 FIREBASE_KEY_PATH = os.getenv('FIREBASE_CREDENTIALS_PATH', 'firebase-key.json')
-FIRESTORE_DB_ID = os.getenv('FIRESTORE_DATABASE', '(database2)')
+FIRESTORE_DB_ID = os.getenv('FIRESTORE_DATABASE', 'database2')
 
 # Initialize Firebase. On local dev we read a service-account JSON. On Cloud Run
 # (no JSON present) we fall back to Application Default Credentials — the
