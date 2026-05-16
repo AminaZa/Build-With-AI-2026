@@ -26,3 +26,7 @@ build/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Claude Code session-local state
+.claude/
+**/.claude/settings.local.json
