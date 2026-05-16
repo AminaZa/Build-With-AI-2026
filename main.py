@@ -8,6 +8,7 @@ from dateutil.parser import parse
 
 import firebase_admin
 from firebase_admin import credentials, firestore
+import ai_engine
 
 # Initialize Firebase
 try:
@@ -84,18 +85,6 @@ def compute_health_score(linkage):
     total = meeting_score + feedback_score + milestone_score + recency_score
     return round(min(100, max(0, total)))
 
-def generate_meeting_topic(linkage):
-    return {
-        "topic": "Re-aligning on Product-Market Fit",
-        "reasoning": "Engagement has dropped; focusing on a core existential topic often reignites interest."
-    }
-
-def propose_reassignment(linkage):
-    return {
-        "newMentor": "mentor_002",
-        "reasoning": "Current mentor's engagement has dropped below critical levels. Mentor 002 has high availability and matching expertise."
-    }
-
 def determine_agent_action(linkage, health_score):
     signals = linkage.get('signals', {})
     last_meeting_str = signals.get('lastMeeting')
@@ -106,31 +95,28 @@ def determine_agent_action(linkage, health_score):
     now = datetime.datetime.utcnow()
     days_since_meeting = (now - last_meeting).days
     
-    if 6 <= days_since_meeting < 14:
+    # Rule Pre-filter for healthy cases
+    if health_score >= 70 and 6 <= days_since_meeting < 14:
         return {
             'tier': 'auto',
             'type': 'reminder_sent',
             'description': f"Sent weekly meeting reminder to {linkage.get('mentorName')} and {linkage.get('startupName')}",
+            'aiReasoning': "Health score is good. Automated tier 1 reminder."
         }
-    
-    if health_score < 70 and linkage.get('healthTrend') == 'declining':
-        ai_response = generate_meeting_topic(linkage)
+        
+    if health_score < 70 or days_since_meeting >= 14:
+        # LLM-Primary action for at-risk or failing
+        ai_response = ai_engine.decide_agent_action(linkage)
+        
         return {
-            'tier': 'inform',
-            'type': 'agenda_sent',
-            'description': f"Sent focused meeting agenda: '{ai_response['topic']}'",
-            'aiReasoning': ai_response['reasoning'],
+            'tier': ai_response.get('tier', 'inform'),
+            'type': ai_response.get('action', 'do_nothing'),
+            'description': ai_response.get('description', ''),
+            'aiReasoning': ai_response.get('aiReasoning', ''),
+            'suggestedMeetingTopic': ai_response.get('suggestedMeetingTopic'),
+            'newMentorSuggestion': ai_response.get('newMentorSuggestion')
         }
-    
-    if days_since_meeting >= 21 or health_score < 30:
-        ai_response = propose_reassignment(linkage)
-        return {
-            'tier': 'approve',
-            'type': 'reassign_proposed',
-            'description': f"Proposes reassigning {linkage.get('startupName')} to {ai_response['newMentor']}",
-            'aiReasoning': ai_response['reasoning'],
-        }
-    
+        
     return None
 
 def get_cross_programme_intelligence(source_programme_id):
@@ -259,9 +245,21 @@ def get_actions(tier: Optional[str] = None, status: Optional[str] = None, linkag
 
 @app.post("/api/matching/generate")
 def generate_matching():
-    return {"proposedPairings": [
-        {"mentorId": "mentor_001", "startupId": "startup_015", "reasoning": "Strong match in fintech."}
-    ]}
+    if not db: raise HTTPException(status_code=500, detail="Database not connected")
+    
+    mentors = [d.to_dict() for d in db.collection('actors').where('type', '==', 'mentor').stream()]
+    startups = [d.to_dict() for d in db.collection('actors').where('type', '==', 'startup').stream()]
+    
+    goals = {
+        "engagementRate": 85,
+        "matchCount": 20,
+        "targetOutcome": "product-market fit"
+    }
+    
+    historical_linkages = [d.to_dict() for d in db.collection('linkages').stream()]
+    
+    ai_response = ai_engine.generate_matching_plan(mentors, startups, goals, historical_linkages)
+    return ai_response
 
 @app.post("/api/matching/approve")
 def approve_matching():
@@ -287,12 +285,24 @@ def undo_action(action_id: str):
 
 @app.post("/api/programmes/{programme_id}/launch")
 def launch_programme(programme_id: str):
+    if not db: raise HTTPException(status_code=500, detail="Database not connected")
     parent_prog_id = "prog_A"
     intelligence = get_cross_programme_intelligence(parent_prog_id)
+    
+    prog_doc = db.collection('programmes').document(programme_id).get()
+    new_programme = prog_doc.to_dict() if prog_doc.exists else {"id": programme_id}
+    
+    completed_linkages = [d.to_dict() for d in db.collection('linkages').where('programmeId', '==', parent_prog_id).stream()]
+    
+    ai_cross_prog = ai_engine.generate_cross_programme_insights(completed_linkages, intelligence, new_programme)
+    
     return {
         "status": "success", 
         "message": f"Programme {programme_id} launched.",
-        "crossProgrammeIntelligence": intelligence
+        "crossProgrammeIntelligence": {
+            "stats": intelligence,
+            "aiInsights": ai_cross_prog
+        }
     }
 
 @app.post("/api/engine/run")
