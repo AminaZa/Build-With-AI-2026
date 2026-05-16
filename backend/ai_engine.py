@@ -17,11 +17,11 @@ model = genai.GenerativeModel('gemini-2.0-flash')
 DEMO_MODE = os.getenv('DEMO_MODE', 'False').lower() == 'true'
 
 DEMO_CACHE = {
-    'matching_plan': {
+    'matching_plan_success': {
         "pairings": [
             {
                 "mentorId": "mentor_001",
-                "startupId": "startup_015",
+                "startupId": "startup_001",
                 "confidence": 0.94,
                 "reasoning": "Dr. Aisha's 12 years in fintech align perfectly with PayFlex's payment infrastructure focus. She achieved 95% satisfaction with similar startups previously.",
                 "risks": "At 2/3 capacity \u2014 manageable but monitor.",
@@ -31,20 +31,20 @@ DEMO_CACHE = {
         "unmatched": [],
         "summary": "Prioritized expertise-domain alignment with capacity balancing. Used historical data to optimize for fintech focus."
     },
-    'health_insight': {
-        "insight": "Meeting frequency dropped from weekly to biweekly since May 3, and the last feedback score was 2.1/5 \u2014 the lowest in this cohort. Historically, relationships with this pattern disengage within 14 days.",
-        "suggestedAction": "Send focused agenda and suggest discussing immediate blockers.",
-        "suggestedTopic": "Fundraising deck review and addressing payment gateway integration blockers.",
+    'health_insight_failed': {
+        "insight": "Kumar has ghosted the startup. Meeting frequency has flatlined and feedback sentiment trajectory shows severe degradation over the past 3 weeks.",
+        "suggestedAction": "Immediately propose mentor reassignment.",
+        "suggestedTopic": None,
         "urgency": "critical",
-        "predictedOutcome": "Relationship will likely fail if an intervention is not made."
+        "predictedOutcome": "Startup MedTrack will disengage from the program without immediate intervention."
     },
-    'agent_action': {
-        "action": "agenda_sent",
-        "tier": "inform",
-        "description": "Sent a focused meeting agenda based on startup's current needs (payment gateway issues).",
-        "aiReasoning": "Meeting quality correlates with focused agendas. Since feedback dropped recently, a proactive agenda helps stabilize the engagement.",
-        "suggestedMeetingTopic": "Payment Gateway and Fundraising Prep",
-        "newMentorSuggestion": None
+    'agent_action_failed': {
+        "action": "reassign_proposed",
+        "tier": "approve",
+        "description": "Proposed mentor reassignment due to critical health score (< 40) and consistent ghosting.",
+        "aiReasoning": "Calculated health metric is below 40. Sentiment trajectory and meeting frequency dictate an automated Tier 3 reassignment loop.",
+        "suggestedMeetingTopic": None,
+        "newMentorSuggestion": "mentor_003"
     },
     'cross_programme': {
         "topMentors": [
@@ -69,7 +69,7 @@ DEMO_CACHE = {
         "carryOverSuggestions": [
             {
                 "mentorId": "mentor_001",
-                "startupId": "startup_015",
+                "startupId": "startup_001",
                 "reason": "Unfinished mentorship from Programme A \u2014 PayFlex still needs fundraising support."
             }
         ]
@@ -84,10 +84,13 @@ def call_gemini_with_fallback(prompt: str, cache_key: str = None):
     try:
         response = model.generate_content(prompt)
         text = response.text.strip()
-        # Clean up JSON if wrapped in markdown fences
+        # Strict programmatic parsing guardrails
         if text.startswith('```'):
-            text = text.split('\n', 1)[1]
-            text = text.rsplit('```', 1)[0]
+            first_newline = text.find('\n')
+            if first_newline != -1:
+                text = text[first_newline+1:]
+            if text.endswith('```'):
+                text = text[:-3]
         return json.loads(text.strip())
     except Exception as e:
         print(f"Gemini API error: {e}")
@@ -98,6 +101,7 @@ def call_gemini_with_fallback(prompt: str, cache_key: str = None):
         raise e
 
 def generate_matching_plan(mentors, startups, goals, historical_data=None):
+    cache_key = 'matching_plan_success' # Defaulting for demo intercept
     prompt = f"""You are an ecosystem matching engine for an innovation programme.
 
 Your job: create optimal mentor-startup pairings that maximize programme outcomes.
@@ -116,16 +120,17 @@ PROGRAMME GOALS:
 RULES:
 - Each mentor can be matched to at most their capacity limit
 - Prioritize expertise alignment (mentor's expertise should match startup's domain)
+- ECOSYSTEM CONFLICT-OF-INTEREST GUARDRAIL: If a mentor is already assigned to a startup in the exact same domain/niche, flag a warning in the 'risks' field and lower the matching confidence score.
 - If historical data exists, factor in past performance (high satisfaction = prefer that mentor for similar startups)
 - Flag risks explicitly (capacity stretched, domain mismatch, new mentor with no track record)
 - If a mentor and startup worked together before and it went well, note this as a positive signal
 
-Respond with ONLY valid JSON, no markdown fences, no explanation. Use this exact structure:
+IMPORTANT: Return ONLY a raw JSON object. Do not include any markdown formatting, no ```json blocks, no leading conversational text, and no trailing text. Your entire response must be parseable by json.loads(). Use this exact structure:
 {{
   "pairings": [
     {{
       "mentorId": "mentor_001",
-      "startupId": "startup_015",
+      "startupId": "startup_001",
       "confidence": 0.92,
       "reasoning": "2-3 sentence explanation of why this is a good match",
       "risks": "Any concerns or null if none",
@@ -136,9 +141,13 @@ Respond with ONLY valid JSON, no markdown fences, no explanation. Use this exact
   "summary": "One paragraph overview of the matching strategy"
 }}"""
     
-    return call_gemini_with_fallback(prompt, cache_key='matching_plan')
+    return call_gemini_with_fallback(prompt, cache_key=cache_key)
 
 def generate_health_insight(linkage_data):
+    cache_key = 'health_insight'
+    if linkage_data.get('startupId') == 'startup_002' and linkage_data.get('mentorId') == 'mentor_002':
+        cache_key = 'health_insight_failed'
+
     prompt = f"""You are an AI relationship analyst for an innovation ecosystem.
 
 Analyze this mentor-startup relationship and provide insights.
@@ -150,9 +159,10 @@ CONTEXT:
 - meetingFrequency is meetings per week (1.0 = weekly, 0.5 = biweekly, 0 = no meetings)
 - feedbackAvg is on a 1-5 scale (5 = excellent)
 - healthScore is 0-100 (>70 = healthy, 40-70 = at risk, <40 = failing)
+- SENTIMENT TRAJECTORY ANALYSIS: Inspect the textual feedback array chronologically. If the tone is degrading over time, automatically escalate the 'urgency' field to 'high' or 'critical'.
 - healthTrend shows direction over the past 2 weeks
 
-Respond with ONLY valid JSON, no markdown fences:
+IMPORTANT: Return ONLY a raw JSON object. Do not include any markdown formatting, no ```json blocks, no leading conversational text, and no trailing text. Your entire response must be parseable by json.loads().
 {{
   "insight": "2-3 sentence plain-english explanation of what's happening in this relationship. Be specific \u2014 reference actual numbers. Don't be generic.",
   "suggestedAction": "One specific action the agent should take, or null if relationship is healthy",
@@ -161,9 +171,13 @@ Respond with ONLY valid JSON, no markdown fences:
   "predictedOutcome": "What will happen in 2 weeks if nothing changes"
 }}"""
     
-    return call_gemini_with_fallback(prompt, cache_key='health_insight')
+    return call_gemini_with_fallback(prompt, cache_key=cache_key)
 
 def decide_agent_action(linkage_data):
+    cache_key = 'agent_action'
+    if linkage_data.get('startupId') == 'startup_002' and linkage_data.get('mentorId') == 'mentor_002':
+        cache_key = 'agent_action_failed'
+
     prompt = f"""You are an autonomous relationship agent managing one mentor-startup linkage in an innovation ecosystem.
 
 YOUR LINKAGE:
@@ -188,12 +202,13 @@ Tier 3 (propose and wait for admin approval):
 DECISION RULES:
 - If the relationship is healthy (score >70, stable/improving trend), prefer "do_nothing"
 - For routine maintenance (reminders, topics), use Tier 1
+- TIER 3 AUTOMATED REASSIGNMENT LOOP: If a relationship's calculated health metric is critical (< 40), force the agent to assign 'tier': 'approve' and 'action': 'reassign_proposed', and dynamically evaluate the available mentor pool to suggest an alternative ID in the 'newMentorSuggestion' field.
 - For interventions that change the relationship dynamic, use Tier 2
 - For irreversible or high-impact changes, use Tier 3
 - Always explain your reasoning with specific data points
 - Be proactive, not reactive \u2014 act before problems become crises
 
-Respond with ONLY valid JSON, no markdown fences:
+IMPORTANT: Return ONLY a raw JSON object. Do not include any markdown formatting, no ```json blocks, no leading conversational text, and no trailing text. Your entire response must be parseable by json.loads().
 {{
   "action": "the action type or do_nothing",
   "tier": "auto | inform | approve",
@@ -203,7 +218,7 @@ Respond with ONLY valid JSON, no markdown fences:
   "newMentorSuggestion": "If action is reassign_proposed, suggest a replacement mentor type, otherwise null"
 }}"""
     
-    return call_gemini_with_fallback(prompt, cache_key='agent_action')
+    return call_gemini_with_fallback(prompt, cache_key=cache_key)
 
 def generate_cross_programme_insights(completed_linkages, mentor_stats, new_programme):
     prompt = f"""You are an ecosystem intelligence engine. A new programme is starting and you need to provide intelligence from past programmes.
@@ -224,7 +239,7 @@ Analyze the historical data and provide:
 4. Specific recommendations for the new programme
 5. Any mentors who should NOT be re-used (poor track record)
 
-Respond with ONLY valid JSON, no markdown fences:
+IMPORTANT: Return ONLY a raw JSON object. Do not include any markdown formatting, no ```json blocks, no leading conversational text, and no trailing text. Your entire response must be parseable by json.loads().
 {{
   "topMentors": [
     {{
