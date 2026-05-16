@@ -4,9 +4,9 @@ export function Header() {
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end">
         <div className="flex items-center gap-x-4 lg:gap-x-6">
           <div className="hidden sm:flex sm:items-center sm:gap-4">
-            <div className="text-sm font-medium text-[#E8E9ED]">Sarah (Admin)</div>
+            <div className="text-sm font-medium text-[#E8E9ED]">John (Admin)</div>
             <div className="h-9 w-9 rounded-full bg-[#232733] flex items-center justify-center text-[#8B8D98] font-medium text-sm border border-[#2A2D3A]">
-              SA
+              JA
             </div>
           </div>
         </div>

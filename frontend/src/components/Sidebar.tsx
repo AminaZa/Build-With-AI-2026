@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Activity, Share2, Sparkles, Layers, HeartPulse } from 'lucide-react';
@@ -19,9 +20,14 @@ export function Sidebar() {
     <div className="fixed inset-y-0 left-0 w-[240px] bg-[#0B0D14] text-[#8B8D98] flex flex-col border-r border-[#1A1D27]">
       <div className="flex h-16 shrink-0 items-center px-6 border-b border-[#1A1D27]">
         <div className="flex items-center gap-2.5 font-semibold text-lg text-[#E8E9ED]">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <span className="text-white font-bold leading-none text-sm">LM</span>
-          </div>
+          <Image
+            src="/logo.png"
+            alt="LinkMind"
+            width={32}
+            height={32}
+            priority
+            className="h-8 w-8 rounded-full shadow-lg shadow-indigo-500/20"
+          />
           LinkMind
         </div>
       </div>
