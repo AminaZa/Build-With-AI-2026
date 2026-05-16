@@ -75,12 +75,12 @@ def main():
     # ---------- Pick representatives ----------
     healthy = next(l for l in bands['healthy'] if l['id'] == 'link_B_01')
     atrisk = next(l for l in bands['atrisk'] if l['id'] == 'link_B_13')
-    failing = next(l for l in bands['failing'] if l['id'] == 'link_B_18')
+    failing = next(l for l in bands['failing'] if l['id'] == 'link_B_20')
 
     # ---------- generate_health_insight ----------
     for label, link in [('healthy link_B_01', healthy),
                         ('at-risk link_B_13', atrisk),
-                        ('failing link_B_18', failing)]:
+                        ('failing link_B_20', failing)]:
         banner(f'generate_health_insight — {label}')
         res = ai_engine.generate_health_insight(link)
         print(json.dumps(res, indent=2))
@@ -91,10 +91,10 @@ def main():
     # ---------- decide_agent_action ----------
     expected_tier = {'healthy link_B_01': 'auto',
                      'at-risk link_B_13': 'inform',
-                     'failing link_B_18': 'approve'}
+                     'failing link_B_20': 'approve'}
     for label, link in [('healthy link_B_01', healthy),
                         ('at-risk link_B_13', atrisk),
-                        ('failing link_B_18', failing)]:
+                        ('failing link_B_20', failing)]:
         banner(f'decide_agent_action — {label}')
         res = ai_engine.decide_agent_action(link)
         print(json.dumps(res, indent=2))
@@ -106,8 +106,9 @@ def main():
     paused_startup_ids = [l['startupId'] for l in linkages if l.get('status') == 'paused']
     unmatched_startups = [s for s in startups if s['id'] in paused_startup_ids]
     candidate_mentors = [m for m in mentors if m.get('historicalScore')][:6]
+    partners = [a for a in actors if a.get('type') == 'partner']
     goals = next(p['goals'] for p in programmes if p['id'] == 'prog_B')
-    plan = ai_engine.generate_matching_plan(candidate_mentors, unmatched_startups, goals)
+    plan = ai_engine.generate_matching_plan(candidate_mentors, partners, unmatched_startups, goals)
     print(json.dumps(plan, indent=2))
     check('pairings list present', isinstance(plan.get('pairings'), list))
     check('summary non-empty', bool(plan.get('summary')))
