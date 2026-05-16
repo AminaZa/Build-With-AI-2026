@@ -1,0 +1,27 @@
+[
+  {
+    "id": "prog_A",
+    "name": "Malaysian Fintech Accelerator Cohort 1",
+    "status": "completed",
+    "goals": {
+      "engagementRate": 80,
+      "matchCount": 15,
+      "targetOutcome": "product-market fit"
+    },
+    "startDate": "2025-01-15",
+    "endDate": "2025-06-15"
+  },
+  {
+    "id": "prog_B",
+    "name": "Malaysian Fintech Accelerator Cohort 2",
+    "status": "active",
+    "goals": {
+      "engagementRate": 85,
+      "matchCount": 20,
+      "targetOutcome": "scale and fundraise"
+    },
+    "startDate": "2026-01-15",
+    "endDate": "2026-06-15",
+    "parentProgramme": "prog_A"
+  }
+]

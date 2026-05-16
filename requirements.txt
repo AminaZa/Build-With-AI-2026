@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pydantic
+python-dateutil
+firebase-admin
+python-dotenv
+google-cloud-aiplatform
