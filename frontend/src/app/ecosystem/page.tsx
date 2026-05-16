@@ -41,16 +41,9 @@ export default function EcosystemPage() {
 
   useEffect(() => {
     refetch();
-    // Re-pull data whenever the user tabs back to this page — picks up the
-    // effect of an approve/reject they just did in another tab.
-    const onFocus = () => refetch();
-    const onVisible = () => { if (!document.hidden) refetch(); };
-    window.addEventListener('focus', onFocus);
-    document.addEventListener('visibilitychange', onVisible);
-    return () => {
-      window.removeEventListener('focus', onFocus);
-      document.removeEventListener('visibilitychange', onVisible);
-    };
+    // Note: no auto-refetch on focus / visibilitychange. Those were causing the
+    // network to reload constantly and wipe the user's dragged node positions.
+    // Use the explicit Refresh button when you want to pull fresh data.
   }, [refetch]);
 
   const grouped = useMemo(() => {
