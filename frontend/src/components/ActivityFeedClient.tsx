@@ -349,6 +349,19 @@ function SectionHeader({
 
 function ActionCard({ action }: { action: Action }) {
   const cfg = TIER_CONFIG[action.tier];
+  const [undone, setUndone] = useState(false);
+  const [undoing, setUndoing] = useState(false);
+
+  async function undo() {
+    setUndoing(true);
+    try {
+      const r = await fetch(`http://localhost:8000/api/actions/${action.id}/undo`, { method: 'POST' });
+      if (r.ok) setUndone(true);
+    } finally {
+      setUndoing(false);
+    }
+  }
+
   return (
     <div
       className="p-5 flex items-start gap-4 hover:bg-[#232733]/40 transition-colors"
@@ -358,8 +371,20 @@ function ActionCard({ action }: { action: Action }) {
         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
           <TierBadge tier={action.tier} />
           <span className="text-xs text-[#5F6170]">{timeAgo(action.timestamp)}</span>
+          {action.tier === 'inform' && !undone && (
+            <button
+              onClick={undo}
+              disabled={undoing}
+              className="ml-auto text-xs font-medium text-[#60A5FA] hover:text-[#93C5FD] disabled:opacity-50"
+            >
+              {undoing ? 'Undoing…' : 'Undo'}
+            </button>
+          )}
+          {undone && (
+            <span className="ml-auto text-xs text-[#5F6170] italic">Undone</span>
+          )}
         </div>
-        <p className="text-sm font-medium text-[#E8E9ED]">
+        <p className={`text-sm font-medium ${undone ? 'text-[#5F6170] line-through' : 'text-[#E8E9ED]'}`}>
           {fixEncoding(action.description)}
         </p>
       </div>

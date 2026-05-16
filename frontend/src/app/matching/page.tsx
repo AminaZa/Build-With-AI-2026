@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, Check } from 'lucide-react';
 
 interface Pairing {
   mentorId: string;
@@ -20,6 +20,8 @@ interface MatchingPlan {
 
 export default function MatchingPage() {
   const [loading, setLoading] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const [approved, setApproved] = useState(false);
   const [plan, setPlan] = useState<MatchingPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,6 +29,7 @@ export default function MatchingPage() {
     setLoading(true);
     setError(null);
     setPlan(null);
+    setApproved(false);
     try {
       const r = await fetch('http://localhost:8000/api/matching/generate', { method: 'POST' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -35,6 +38,22 @@ export default function MatchingPage() {
       setError(e instanceof Error ? e.message : 'Failed to generate plan');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function approveAll() {
+    if (!plan) return;
+    setApproving(true);
+    setError(null);
+    try {
+      const r = await fetch('http://localhost:8000/api/matching/approve', { method: 'POST' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      await r.json();
+      setApproved(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Approve-all failed');
+    } finally {
+      setApproving(false);
     }
   }
 
@@ -105,6 +124,26 @@ export default function MatchingPage() {
               </div>
             ))}
           </div>
+
+          {plan.pairings.length > 0 && (
+            <div className="sticky bottom-6 z-30 flex items-center justify-end gap-3">
+              {approved ? (
+                <div className="rounded-lg bg-[#0D2A1A] border border-[#166534] px-4 py-2.5 text-sm font-medium text-[#34D399] flex items-center gap-2 shadow-lg">
+                  <Check className="h-4 w-4" />
+                  {plan.pairings.length} pairings approved and activated.
+                </div>
+              ) : (
+                <button
+                  onClick={approveAll}
+                  disabled={approving}
+                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 transition-colors shadow-lg"
+                >
+                  {approving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                  {approving ? 'Approving…' : `Approve all ${plan.pairings.length}`}
+                </button>
+              )}
+            </div>
+          )}
         </>
       )}
 

@@ -1,20 +1,608 @@
 [
-  { "id": "act_001", "linkageId": "link_B_01", "type": "nudge_sent", "description": "Sent weekly meeting reminder to Dr. Aisha and PayFlex", "status": "executed", "timestamp": "2026-05-15T08:00:00Z", "aiReasoning": "Routine Tier 1 action." },
-  { "id": "act_002", "linkageId": "link_B_02", "type": "health_update", "description": "Updated health score for LendSmart ↔ Dr. Aisha: 86 → 88 after positive feedback", "status": "executed", "timestamp": "2026-05-15T09:00:00Z", "aiReasoning": "Feedback score of 4.5 received." },
-  { "id": "act_003", "linkageId": "link_B_06", "type": "topic_suggested", "description": "Suggested discussion topic for AgriSense ↔ Ahmad: 'IoT sensor deployment timeline'", "status": "executed", "timestamp": "2026-05-15T10:00:00Z", "aiReasoning": "Analyzed startup's recent milestone check-in." },
-  { "id": "act_004", "linkageId": "link_B_03", "type": "nudge_sent", "description": "Sent weekly meeting reminder to Wei Ling and MedTrack", "status": "executed", "timestamp": "2026-05-15T10:00:00Z", "aiReasoning": "Routine Tier 1 action." },
-  { "id": "act_005", "linkageId": "link_B_08", "type": "milestone_logged", "description": "Logged milestone completion: CreditAI achieved 'model accuracy benchmark'", "status": "executed", "timestamp": "2026-05-15T11:00:00Z", "aiReasoning": "Startup updated progress report." },
-  { "id": "act_006", "linkageId": "link_B_04", "type": "health_update", "description": "Updated health score for DataMart ↔ Rajesh: 80 → 82", "status": "executed", "timestamp": "2026-05-15T11:15:00Z", "aiReasoning": "Consistent meeting cadence." },
-  { "id": "act_007", "linkageId": "link_B_10", "type": "nudge_sent", "description": "Sent weekly meeting reminder to Nurul and LearnLah", "status": "executed", "timestamp": "2026-05-15T11:30:00Z", "aiReasoning": "Routine Tier 1 action." },
-  { "id": "act_008", "linkageId": "link_B_11", "type": "topic_suggested", "description": "Suggested discussion topic for QuickClaim ↔ Daniel: 'Regulatory sandbox application'", "status": "executed", "timestamp": "2026-05-15T11:45:00Z", "aiReasoning": "Startup requested regulatory help in profile." },
-  { "id": "act_009", "linkageId": "link_B_12", "type": "nudge_sent", "description": "Sent weekly meeting reminder to Mei Lin and MediScan", "status": "executed", "timestamp": "2026-05-15T12:00:00Z", "aiReasoning": "Routine Tier 1 action." },
-  { "id": "act_010", "linkageId": "link_B_05", "type": "health_update", "description": "Updated health score for EduPath ↔ Sarah: 77 → 78", "status": "executed", "timestamp": "2026-05-15T12:15:00Z", "aiReasoning": "Feedback logged." },
-  { "id": "act_011", "linkageId": "link_B_13", "type": "agenda_sent", "description": "Detected declining feedback for WalletKu ↔ Dr. Aisha (4.0 → 3.2). Sent focused agenda: 'Fundraising strategy session'", "status": "executed", "timestamp": "2026-05-15T12:30:00Z", "aiReasoning": "WalletKu mentioned Series A prep in latest update. Agent acted to prevent further decline." },
-  { "id": "act_012", "linkageId": "link_B_15", "type": "cadence_adjusted", "description": "Meeting cadence for PayrollPro ↔ Rajesh dropped. Sent engagement nudge with topic: 'SME market segmentation'", "status": "executed", "timestamp": "2026-05-15T12:45:00Z", "aiReasoning": "Irregular meetings detected. Intervening." },
-  { "id": "act_013", "linkageId": "link_B_16", "type": "alert_sent", "description": "GreenPay ↔ Priya health dropped below 50. Sent alert to both parties with structured check-in template.", "status": "executed", "timestamp": "2026-05-15T13:00:00Z", "aiReasoning": "Health score breached critical threshold (50)." },
-  { "id": "act_014", "linkageId": "link_B_14", "type": "assessment_sent", "description": "FreshRoute ↔ Kumar feedback score hit 2.8. Sent domain-fit assessment to admin.", "status": "executed", "timestamp": "2026-05-15T13:15:00Z", "aiReasoning": "Consistent negative feedback patterns indicate systemic mismatch." },
-  { "id": "act_015", "linkageId": "link_B_17", "type": "partner_connected", "description": "InsureMe stalled on regulatory milestone. Auto-connected InsureMe to Partner: Zico Law for legal clinic hours.", "status": "executed", "timestamp": "2026-05-15T13:30:00Z", "aiReasoning": "Mentor Sarah Chen lacks regulatory expertise. Augmenting with partner resource." },
-  { "id": "act_016", "linkageId": "link_B_18", "type": "auto_reassigned", "tier": "auto", "description": "Auto-reassigned: MedTrack moved from Kumar to Dr. Tan Mei Lin (Kumar unresponsive 21 days; Dr. Tan has capacity and regulatory expertise).", "status": "executed", "newMentorId": "mentor_004", "timestamp": "2026-05-15T14:00:00Z", "aiReasoning": "Historical recovery rate at this stage: 6%. Replacement match confidence > 90% — applied without admin approval." },
-  { "id": "act_017", "linkageId": "link_B_20", "type": "reassign_proposed", "tier": "approve", "description": "Proposes reassigning TaniTech from Wong Kai Xin to a hardware mentor.", "status": "proposed", "timestamp": "2026-05-15T14:15:00Z", "aiReasoning": "Domain mismatch: AI/ML mentor for drone hardware startup. No current hardware mentors available — escalating to admin." },
-  { "id": "act_018", "linkageId": "link_B_19", "type": "auto_disconnected", "tier": "auto", "description": "Auto-disconnected: BlockTrade ↔ James (programme mismatch — James belongs to Programme A only).", "status": "executed", "timestamp": "2026-05-15T14:30:00Z", "aiReasoning": "Hard-mismatch detected and health ≤ 35. Severed automatically per autonomy policy." }
+  {
+    "id": "act_001",
+    "linkageId": "link_B_01",
+    "type": "nudge_sent",
+    "description": "Sent weekly meeting reminder to Dr. Aisha and PayFlex",
+    "status": "executed",
+    "timestamp": "2026-05-15T08:00:00Z",
+    "aiReasoning": "Routine Tier 1 action."
+  },
+  {
+    "id": "act_002",
+    "linkageId": "link_B_02",
+    "type": "health_update",
+    "description": "Updated health score for LendSmart ↔ Dr. Aisha: 86 → 88 after positive feedback",
+    "status": "executed",
+    "timestamp": "2026-05-15T09:00:00Z",
+    "aiReasoning": "Feedback score of 4.5 received."
+  },
+  {
+    "id": "act_003",
+    "linkageId": "link_B_06",
+    "type": "topic_suggested",
+    "description": "Suggested discussion topic for AgriSense ↔ Ahmad: 'IoT sensor deployment timeline'",
+    "status": "executed",
+    "timestamp": "2026-05-15T10:00:00Z",
+    "aiReasoning": "Analyzed startup's recent milestone check-in."
+  },
+  {
+    "id": "act_004",
+    "linkageId": "link_B_03",
+    "type": "nudge_sent",
+    "description": "Sent weekly meeting reminder to Wei Ling and MedTrack",
+    "status": "executed",
+    "timestamp": "2026-05-15T10:00:00Z",
+    "aiReasoning": "Routine Tier 1 action."
+  },
+  {
+    "id": "act_005",
+    "linkageId": "link_B_08",
+    "type": "milestone_logged",
+    "description": "Logged milestone completion: CreditAI achieved 'model accuracy benchmark'",
+    "status": "executed",
+    "timestamp": "2026-05-15T11:00:00Z",
+    "aiReasoning": "Startup updated progress report."
+  },
+  {
+    "id": "act_006",
+    "linkageId": "link_B_04",
+    "type": "health_update",
+    "description": "Updated health score for DataMart ↔ Rajesh: 80 → 82",
+    "status": "executed",
+    "timestamp": "2026-05-15T11:15:00Z",
+    "aiReasoning": "Consistent meeting cadence."
+  },
+  {
+    "id": "act_007",
+    "linkageId": "link_B_10",
+    "type": "nudge_sent",
+    "description": "Sent weekly meeting reminder to Nurul and LearnLah",
+    "status": "executed",
+    "timestamp": "2026-05-15T11:30:00Z",
+    "aiReasoning": "Routine Tier 1 action."
+  },
+  {
+    "id": "act_008",
+    "linkageId": "link_B_11",
+    "type": "topic_suggested",
+    "description": "Suggested discussion topic for QuickClaim ↔ Daniel: 'Regulatory sandbox application'",
+    "status": "executed",
+    "timestamp": "2026-05-15T11:45:00Z",
+    "aiReasoning": "Startup requested regulatory help in profile."
+  },
+  {
+    "id": "act_009",
+    "linkageId": "link_B_12",
+    "type": "nudge_sent",
+    "description": "Sent weekly meeting reminder to Mei Lin and MediScan",
+    "status": "executed",
+    "timestamp": "2026-05-15T12:00:00Z",
+    "aiReasoning": "Routine Tier 1 action."
+  },
+  {
+    "id": "act_010",
+    "linkageId": "link_B_05",
+    "type": "health_update",
+    "description": "Updated health score for EduPath ↔ Sarah: 77 → 78",
+    "status": "executed",
+    "timestamp": "2026-05-15T12:15:00Z",
+    "aiReasoning": "Feedback logged."
+  },
+  {
+    "id": "act_011",
+    "linkageId": "link_B_13",
+    "type": "agenda_sent",
+    "description": "Detected declining feedback for WalletKu ↔ Dr. Aisha (4.0 → 3.2). Sent focused agenda: 'Fundraising strategy session'",
+    "status": "executed",
+    "timestamp": "2026-05-15T12:30:00Z",
+    "aiReasoning": "WalletKu mentioned Series A prep in latest update. Agent acted to prevent further decline."
+  },
+  {
+    "id": "act_012",
+    "linkageId": "link_B_15",
+    "type": "cadence_adjusted",
+    "description": "Meeting cadence for PayrollPro ↔ Rajesh dropped. Sent engagement nudge with topic: 'SME market segmentation'",
+    "status": "executed",
+    "timestamp": "2026-05-15T12:45:00Z",
+    "aiReasoning": "Irregular meetings detected. Intervening."
+  },
+  {
+    "id": "act_013",
+    "linkageId": "link_B_16",
+    "type": "alert_sent",
+    "description": "GreenPay ↔ Priya health dropped below 50. Sent alert to both parties with structured check-in template.",
+    "status": "executed",
+    "timestamp": "2026-05-15T13:00:00Z",
+    "aiReasoning": "Health score breached critical threshold (50)."
+  },
+  {
+    "id": "act_014",
+    "linkageId": "link_B_14",
+    "type": "assessment_sent",
+    "description": "FreshRoute ↔ Kumar feedback score hit 2.8. Sent domain-fit assessment to admin.",
+    "status": "executed",
+    "timestamp": "2026-05-15T13:15:00Z",
+    "aiReasoning": "Consistent negative feedback patterns indicate systemic mismatch."
+  },
+  {
+    "id": "act_015",
+    "linkageId": "link_B_17",
+    "type": "partner_connected",
+    "description": "InsureMe stalled on regulatory milestone. Auto-connected InsureMe to Partner: Zico Law for legal clinic hours.",
+    "status": "executed",
+    "timestamp": "2026-05-15T13:30:00Z",
+    "aiReasoning": "Mentor Sarah Chen lacks regulatory expertise. Augmenting with partner resource."
+  },
+  {
+    "id": "act_016",
+    "linkageId": "link_B_18",
+    "type": "reassign_proposed",
+    "tier": "approve",
+    "description": "Proposes reassigning MedTrack from Kumar to Dr. Tan Mei Lin. Kumar unresponsive for 21 days.",
+    "status": "proposed",
+    "newMentorId": "mentor_004",
+    "timestamp": "2026-05-15T14:00:00Z",
+    "aiReasoning": "Historical recovery rate at this stage: 6%. Dr. Tan Mei Lin — healthtech expert, 88% satisfaction score, available capacity."
+  },
+  {
+    "id": "act_017",
+    "linkageId": "link_B_20",
+    "type": "reassign_proposed",
+    "tier": "approve",
+    "description": "Proposes reassigning TaniTech from Wong Kai Xin to a hardware mentor.",
+    "status": "proposed",
+    "timestamp": "2026-05-15T14:15:00Z",
+    "aiReasoning": "Domain mismatch: AI/ML mentor for drone hardware startup. No current hardware mentors available — escalating to admin."
+  },
+  {
+    "id": "act_018",
+    "linkageId": "link_B_19",
+    "type": "pause_proposed",
+    "tier": "approve",
+    "description": "Proposes ending BlockTrade ↔ James relationship.",
+    "status": "proposed",
+    "timestamp": "2026-05-15T14:30:00Z",
+    "aiReasoning": "James belongs to Programme A only and was incorrectly carried over to the active cohort."
+  },
+  {
+    "id": "act_019",
+    "linkageId": "link_B_01",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Dr. Aisha ↔ PayFlex: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T09:13:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_020",
+    "linkageId": "link_B_01",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Dr. Aisha ↔ PayFlex: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T09:20:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_021",
+    "linkageId": "link_B_01",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: PayFlex on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T09:27:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_022",
+    "linkageId": "link_B_02",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Dr. Aisha ↔ LendSmart: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T09:34:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_023",
+    "linkageId": "link_B_02",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Dr. Aisha ↔ LendSmart: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T09:41:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_024",
+    "linkageId": "link_B_02",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: LendSmart on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T09:48:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_025",
+    "linkageId": "link_B_03",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Wei Ling ↔ MedTrack: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T09:55:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_026",
+    "linkageId": "link_B_03",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Wei Ling ↔ MedTrack: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:02:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_027",
+    "linkageId": "link_B_03",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: MedTrack on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:09:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_028",
+    "linkageId": "link_B_04",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Rajesh ↔ DataMart: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:16:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_029",
+    "linkageId": "link_B_04",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Rajesh ↔ DataMart: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:23:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_030",
+    "linkageId": "link_B_04",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: DataMart on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:30:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_031",
+    "linkageId": "link_B_05",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Sarah Chen ↔ EduPath: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:37:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_032",
+    "linkageId": "link_B_05",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Sarah Chen ↔ EduPath: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:44:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_033",
+    "linkageId": "link_B_05",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: EduPath on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:51:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_034",
+    "linkageId": "link_B_06",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Ahmad ↔ AgriSense: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T10:58:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_035",
+    "linkageId": "link_B_06",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Ahmad ↔ AgriSense: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:05:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_036",
+    "linkageId": "link_B_06",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: AgriSense on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:12:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_037",
+    "linkageId": "link_B_07",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Ahmad ↔ FarmLink: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:19:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_038",
+    "linkageId": "link_B_07",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Ahmad ↔ FarmLink: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:26:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_039",
+    "linkageId": "link_B_07",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: FarmLink on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:33:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_040",
+    "linkageId": "link_B_08",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Wong Kai Xin ↔ CreditAI: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:40:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_041",
+    "linkageId": "link_B_08",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Wong Kai Xin ↔ CreditAI: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:47:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_042",
+    "linkageId": "link_B_08",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: CreditAI on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T11:54:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_043",
+    "linkageId": "link_B_09",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Priya ↔ CodeCamp: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:01:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_044",
+    "linkageId": "link_B_09",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Priya ↔ CodeCamp: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:08:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_045",
+    "linkageId": "link_B_09",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: CodeCamp on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:15:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_046",
+    "linkageId": "link_B_10",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Nurul ↔ LearnLah: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:22:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_047",
+    "linkageId": "link_B_10",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Nurul ↔ LearnLah: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:29:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_048",
+    "linkageId": "link_B_10",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: LearnLah on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:36:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_049",
+    "linkageId": "link_B_11",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Daniel ↔ QuickClaim: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:43:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_050",
+    "linkageId": "link_B_11",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Daniel ↔ QuickClaim: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:50:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_051",
+    "linkageId": "link_B_11",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: QuickClaim on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T12:57:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_052",
+    "linkageId": "link_B_12",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score check for Mei Lin ↔ MediScan: stable trajectory.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:04:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_053",
+    "linkageId": "link_B_12",
+    "type": "topic_suggested",
+    "tier": "auto",
+    "description": "Suggested discussion topic for Mei Lin ↔ MediScan: ‘Quarterly milestone review’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:11:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_054",
+    "linkageId": "link_B_12",
+    "type": "milestone_logged",
+    "tier": "auto",
+    "description": "Logged milestone progress: MediScan on track.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:18:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_055",
+    "linkageId": "link_B_13",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score updated for Dr. Aisha ↔ WalletKu after weekly check-in.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:25:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_056",
+    "linkageId": "link_B_14",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score updated for Kumar ↔ FreshRoute after weekly check-in.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:32:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_057",
+    "linkageId": "link_B_15",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score updated for Rajesh ↔ PayrollPro after weekly check-in.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:39:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_058",
+    "linkageId": "link_B_16",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score updated for Priya ↔ GreenPay after weekly check-in.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:46:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_059",
+    "linkageId": "link_B_17",
+    "type": "health_update",
+    "tier": "auto",
+    "description": "Health score updated for Sarah Chen ↔ InsureMe after weekly check-in.",
+    "status": "executed",
+    "timestamp": "2026-05-16T13:53:00Z",
+    "aiReasoning": "Routine Tier 1 maintenance."
+  },
+  {
+    "id": "act_060",
+    "linkageId": "link_B_14",
+    "type": "nudge_sent",
+    "tier": "inform",
+    "description": "Sent engagement nudge to Kumar after FreshRoute feedback dropped below 3.0.",
+    "status": "executed",
+    "timestamp": "2026-05-16T14:00:00Z",
+    "aiReasoning": "Tier 2 acted-and-informed intervention."
+  },
+  {
+    "id": "act_061",
+    "linkageId": "link_B_15",
+    "type": "cadence_adjusted",
+    "tier": "inform",
+    "description": "Adjusted meeting cadence for PayrollPro ↔ Rajesh: weekly → biweekly check-ins.",
+    "status": "executed",
+    "timestamp": "2026-05-16T14:07:00Z",
+    "aiReasoning": "Tier 2 acted-and-informed intervention."
+  },
+  {
+    "id": "act_062",
+    "linkageId": "link_B_17",
+    "type": "agenda_sent",
+    "tier": "inform",
+    "description": "Sent focused agenda to InsureMe ↔ Sarah Chen: ‘Regulatory sandbox application’.",
+    "status": "executed",
+    "timestamp": "2026-05-16T14:14:00Z",
+    "aiReasoning": "Tier 2 acted-and-informed intervention."
+  }
 ]

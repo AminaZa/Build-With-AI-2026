@@ -2,7 +2,7 @@
   { "id": "mentor_001", "type": "mentor", "name": "Dr. Aisha Rahman", "expertise": ["fintech", "payments", "fundraising"], "capacity": 3, "historicalScore": 92, "programmes": ["prog_A", "prog_B"] },
   { "id": "mentor_002", "type": "mentor", "name": "Kumar Shanmugam", "expertise": ["operations", "supply-chain", "logistics"], "capacity": 3, "historicalScore": 71, "programmes": ["prog_A", "prog_B"] },
   { "id": "mentor_003", "type": "mentor", "name": "Lim Wei Ling", "expertise": ["healthtech", "pharma", "regulatory"], "capacity": 3, "historicalScore": 88, "programmes": ["prog_A", "prog_B"] },
-  { "id": "mentor_004", "type": "mentor", "name": "Tan Mei Lin", "expertise": ["healthtech", "biotech", "clinical-trials"], "capacity": 2, "historicalScore": 85, "programmes": ["prog_A", "prog_B"] },
+  { "id": "mentor_004", "type": "mentor", "name": "Tan Mei Lin", "expertise": ["healthtech", "biotech", "clinical-trials"], "capacity": 2, "historicalScore": 88, "programmes": ["prog_A", "prog_B"] },
   { "id": "mentor_005", "type": "mentor", "name": "Rajesh Nair", "expertise": ["SaaS", "B2B-sales", "enterprise"], "capacity": 3, "historicalScore": 79, "programmes": ["prog_A", "prog_B"] },
   { "id": "mentor_006", "type": "mentor", "name": "Sarah Chen", "expertise": ["product-strategy", "UX", "consumer"], "capacity": 2, "historicalScore": null, "programmes": ["prog_B"] },
   { "id": "mentor_007", "type": "mentor", "name": "Ahmad Fauzi", "expertise": ["agritech", "sustainability", "impact"], "capacity": 2, "historicalScore": null, "programmes": ["prog_B"] },

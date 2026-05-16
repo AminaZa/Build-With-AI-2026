@@ -332,7 +332,7 @@ def generate_matching():
         linkage_data = {
             'id': linkage_id,
             'type': 'mentorship',
-            'status': 'active',
+            'status': 'proposed',   # script wants John to review then Approve All
             'mentorId': mentor_id,
             'startupId': startup_id,
             'programmeId': 'prog_B',
@@ -346,20 +346,9 @@ def generate_matching():
         db.collection('linkages').document(linkage_id).set(linkage_data)
         created_linkages.append(linkage_id)
         existing_linkages.add(pair_key)
-        
-        # Log as auto-executed (no approval needed for smart matches)
-        action_ref = db.collection('actions').document()
-        action_data = {
-            'id': action_ref.id,
-            'linkageId': linkage_id,
-            'type': 'match_activated',
-            'tier': 'auto',
-            'description': f"Smart-matched and activated: {mentor_name} \u2194 {startup_name} (confidence: {int(pairing.get('confidence', 0) * 100)}%)",
-            'status': 'executed',
-            'timestamp': now,
-            'aiReasoning': pairing.get('reasoning', ''),
-        }
-        action_ref.set(action_data)
+        # NB: no action document logged here. Proposed matches live on the
+        # Matching screen, not in the Activity Feed pending list. They get
+        # activated in bulk via POST /api/matching/approve.
     
     ai_response['createdLinkages'] = created_linkages
     ai_response['skippedDuplicates'] = skipped

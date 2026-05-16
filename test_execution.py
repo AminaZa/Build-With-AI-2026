@@ -75,12 +75,12 @@ def main():
     # ---------- Pick representatives ----------
     healthy = next(l for l in bands['healthy'] if l['id'] == 'link_B_01')
     atrisk = next(l for l in bands['atrisk'] if l['id'] == 'link_B_13')
-    failing = next(l for l in bands['failing'] if l['id'] == 'link_B_20')
+    failing = next(l for l in bands['failing'] if l['id'] == 'link_B_18')
 
     # ---------- generate_health_insight ----------
     for label, link in [('healthy link_B_01', healthy),
                         ('at-risk link_B_13', atrisk),
-                        ('failing link_B_20', failing)]:
+                        ('failing link_B_18', failing)]:
         banner(f'generate_health_insight — {label}')
         res = ai_engine.generate_health_insight(link)
         print(json.dumps(res, indent=2))
@@ -91,10 +91,10 @@ def main():
     # ---------- decide_agent_action ----------
     expected_tier = {'healthy link_B_01': 'auto',
                      'at-risk link_B_13': 'inform',
-                     'failing link_B_20': 'approve'}
+                     'failing link_B_18': 'approve'}
     for label, link in [('healthy link_B_01', healthy),
                         ('at-risk link_B_13', atrisk),
-                        ('failing link_B_20', failing)]:
+                        ('failing link_B_18', failing)]:
         banner(f'decide_agent_action — {label}')
         res = ai_engine.decide_agent_action(link)
         print(json.dumps(res, indent=2))
