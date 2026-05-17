@@ -12,7 +12,7 @@ Innovation programmes (accelerators, incubators, government initiatives) connect
 
 | Surface | URL |
 |---|---|
-| **Frontend (Vercel)** | _https://&lt;your-vercel-url&gt;.vercel.app_ — populated once frontend is deployed |
+| **Live app (Vercel)** | **https://build-with-ai-2026-chi.vercel.app** |
 | **Backend API (Cloud Run)** | https://linkmind-api-690277070095.us-central1.run.app |
 | **Backend Swagger UI** | https://linkmind-api-690277070095.us-central1.run.app/docs |
 
