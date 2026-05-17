@@ -8,6 +8,18 @@ Innovation programmes (accelerators, incubators, government initiatives) connect
 
 ---
 
+## 🚀 Live demo
+
+| Surface | URL |
+|---|---|
+| **Frontend (Vercel)** | _https://&lt;your-vercel-url&gt;.vercel.app_ — populated once frontend is deployed |
+| **Backend API (Cloud Run)** | https://linkmind-api-690277070095.us-central1.run.app |
+| **Backend Swagger UI** | https://linkmind-api-690277070095.us-central1.run.app/docs |
+
+The backend is publicly reachable, talks to Firestore (`hackathon-496503/database2`) and Vertex AI (`gemini-2.5-flash`), and is pre-seeded with the canonical demo state: 36 actors, 23 linkages (12 healthy / 5 at-risk / 3 failing), 62 actions (47 auto / 12 informed / 3 awaiting approval).
+
+---
+
 ## What's in the box
 
 ### Backend (FastAPI + Gemini via Vertex AI + Firestore)
